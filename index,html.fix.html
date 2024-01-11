@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+ 
+<head>
+    <title>Rawan Banjir</title>
+    <link rel="stylesheet" href="library/leaflet/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="library/leaflet/leaflet.js"></script>
+    <script src="library/leaflet-providers-master/leaflet-providers.js"></script>
+    <script src="library/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="map">
+        <script>
+            var map = L.map('map').setView([-6.974783, 110.4052], 13);
+
+            var baseLayers = {
+                'Esri WorldShadedRelief': L.tileLayer.provider('Esri.WorldShadedRelief'),
+                'Esri WorldImagery': L.tileLayer.provider('Esri.WorldImagery'), 
+                'OSM Default': L.tileLayer.provider('OpenStreetMap.DE').addTo(map),
+                'OSM France': L.tileLayer.provider('OpenStreetMap.France')
+            };
+
+
+            /* Memanggil Layer Rawan Banjir */
+            var AreaRawanBanjir = L.geoJson(null, {
+                style: function(feature) {
+                    return {
+                        color: "black",
+                        fillColor: KlasBanjir[feature.properties.Klas_Rawan],
+                        weight: 0.3,
+                        opacity: 0,
+                        fillOpacity: 0.7
+                    };
+                },
+                /* Tampilan HTML Pop UP*/  
+                onEachFeature: function( feature, layer ){
+                    layer.bindPopup(
+                        "Klas Rawan Banjir : " + "<left>" + feature.properties.Klas_Rawan + "</left>" + "<br>" +
+                        "Luas :" + "<left>" + feature.properties.Shape_Area + "</left>" + " m2"
+                        )
+                }
+            });
+            /* Add Data JSON ke dalam Script*/
+            $.getJSON("data/Rawan_Banjir_Semarang_Geo.json", function(data) {
+                AreaRawanBanjir.addData(data);
+            });
+
+			/* Merubah Tampilan Warna Berdasar Atribut Klas Banjir */
+			var KlasBanjir = {
+				"Aman":"#b105f5",
+				"Cukup Aman":"#05f505",
+				"Agak Rawan":"#e5f50f",
+				"Rawan":"#f5760f",
+				"Sangat Rawan":"#0509f5"
+			};
+
+            var mapLayers = {
+                'Area Rawan Banjir': AreaRawanBanjir
+            };
+
+            L.control.layers(baseLayers, mapLayers).addTo(map);
+        </script>
+    </div>
+</body>
+
+</html>
